@@ -1,12 +1,10 @@
 import { Router } from 'express'
-import normal from './normal'
-import priority from './priority'
+import tickets from './tickets'
 import ticketsController from './tickets-controller'
 
 const router = new Router()
 
-router.use('/normals', normal)
-router.use('/priorities', priority)
+router.use('/tickets', tickets)
 router.use('/tickets-controllers', ticketsController)
 
 /**

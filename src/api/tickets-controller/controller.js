@@ -3,60 +3,27 @@ import {
   notFound
 } from '../../services/response/'
 import {
-  Priority,
-  update
-} from '../priority'
-import {
-  Normal
-} from '../normal'
-const NORMAL = 'NORMAL'
-const PRIORITY = 'PRIORITY'
-const models = {
-  NORMAL: Normal,
-  PRIORITY: Priority
-}
-const typeConf = {
-  lastCalled: {},
-  timesCalled: {
-    normal: 0
-  }
-}
-const typeHandler = () => {
-  if (typeConf.timesCalled.normal === 2) {
-    typeConf.timesCalled.normal = 0
-    typeConf.lastCalled = PRIORITY
-    return PRIORITY
-  }
-  typeConf.timesCalled.normal++
-
-  return NORMAL
+  Ticket
+} from '../tickets'
+const NORMAL = 'normal'
+const PRIORITY = 'priority'
+const config = {
+  counter: 0
 }
 
-const setLatest = (ticket) => {
-  Object.assign(typeConf.lastCalled, ticket)
+const handlerResponse = (res) => (entity) => {
+  console.log('ENTITY', entity)
+  if (entity.type === NORMAL) config.counter++
+  return entity
 }
-
-const setStateOfLatest = (next) => {
-  let last = typeConf.lastCalled
-  let newState = {
-    state: 'pending'
+const composeFilter = () => {
+  let filter = {}
+  filter['state'] = 'pending'
+  if (config.counter > 2) {
+    config.counter = 0
+    filter['type'] = PRIORITY
   }
-  if (last['state'] === undefined) return
-
-  switch (typeConf.lastCalled['state']) {
-    case 'pending':
-      newState.state = 'inProgress'
-      break
-    case 'inProgress':
-      newState.state = 'completed'
-  }
-
-  models[typeConf.lastCalled].findById(last.id)
-    .then(notFound(last))
-    .then((priority) => priority ? Object.assign(priority, newState).save() : null)
-    .then((priority) => priority ? priority.view(true) : null)
-    .then(success(last))
-    .catch(next)
+  return filter
 }
 
 export const index = ({
@@ -66,14 +33,52 @@ export const index = ({
     cursor
   }
 }, res, next) => {
-  setStateOfLatest(next)
-  models[typeHandler()].findOne({
-    state: 'pending'
-  }).sort({
-    created_at: -1
+  let filter = composeFilter()
+
+  Ticket.count({filter})
+    .then((response) => {
+      if (parseInt(response) !== 0) {
+        Ticket.findOneAndUpdate(
+          filter,
+          {$set: {state: 'called'}},
+          { new: true }
+        ).sort({
+          created_at: 1
+        }).then(notFound(res))
+          .then(handlerResponse(res))
+          .then((ticket) => ticket ? ticket.view() : null)
+          .then(success(res))
+          .catch(next)
+      } else {
+        Ticket.findOneAndUpdate(
+          filter,
+          {$set: {state: 'called'}},
+          { new: true }
+        ).sort({
+          created_at: 1
+        }).then(notFound(res))
+          .then(handlerResponse(res))
+          .then((ticket) => ticket ? ticket.view() : null)
+          .then(success(res))
+          .catch(next)
+      }
+    })
+}
+
+export const nextTicket = ({
+  querymen: {
+    query,
+    select,
+    cursor
+  }
+}, res, next) => {
+  let filter = composeFilter()
+  Ticket.findOne(
+    filter
+  ).sort({
+    created_at: 1
   }).then(notFound(res))
     .then((ticket) => ticket ? ticket.view() : null)
     .then(success(res))
     .catch(next)
-  setLatest(res)
 }

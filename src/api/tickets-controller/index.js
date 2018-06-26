@@ -6,12 +6,16 @@ import {
 } from 'querymen'
 
 import {
-  index
+  index,
+  nextTicket
 } from './controller'
 
 const router = new Router()
 
-router.get('/',
+router.get('/call',
   query(), index)
+
+router.get('/next',
+  query(), nextTicket)
 
 export default router

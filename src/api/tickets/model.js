@@ -1,7 +1,13 @@
 import mongoose, { Schema } from 'mongoose'
 
-const prioritySchema = new Schema({
+const ticketSchema = new Schema({
+  type: {
+    type: String
+  },
   state: {
+    type: String
+  },
+  ticket: {
     type: String
   }
 }, {
@@ -12,12 +18,14 @@ const prioritySchema = new Schema({
   }
 })
 
-prioritySchema.methods = {
+ticketSchema.methods = {
   view (full) {
     const view = {
       // simple view
       id: this.id,
+      type: this.type,
       state: this.state,
+      ticket: this.ticket,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt
     }
@@ -29,7 +37,7 @@ prioritySchema.methods = {
   }
 }
 
-const model = mongoose.model('Priority', prioritySchema)
+const model = mongoose.model('Ticket', ticketSchema)
 
 export const schema = model.schema
 export default model
