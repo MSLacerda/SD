@@ -2,7 +2,7 @@ import { success, notFound } from '../../services/response/'
 import { Ticket } from '.'
 
 export const createNormal = ({ bodymen: { body } }, res, next) => {
-  Ticket.count()
+  Ticket.count({type: 'normal'})
     .then((response) => {
       let ticket = {
         ticket: 'N'.concat(parseInt(response) + 1),
@@ -17,7 +17,7 @@ export const createNormal = ({ bodymen: { body } }, res, next) => {
 }
 
 export const createPriority = ({ bodymen: { body } }, res, next) => {
-  Ticket.count()
+  Ticket.count({type: 'priority'})
     .then((response) => {
       let ticket = {
         ticket: 'P'.concat(parseInt(response) + 1),
