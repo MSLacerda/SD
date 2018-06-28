@@ -6,7 +6,7 @@ import {
 import {
   Ticket
 } from '../tickets'
-
+import { io } from '../../app';
 const NORMAL = 'normal'
 const PRIORITY = 'priority'
 const config = {
@@ -14,6 +14,7 @@ const config = {
 }
 
 const handle = (res) => (entity) => {
+  io.sockets.emit('show_actual_ticket', entity)
   if (entity && entity.type === NORMAL) config.counter += 1
   return entity
 }
