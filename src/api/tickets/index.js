@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import { middleware as query } from 'querymen'
 import { middleware as body } from 'bodymen'
-import { createNormal, createPriority, index, show, update, destroy } from './controller'
+import { createNormal, createPriority, index, show, update, destroy, downloadFile } from './controller'
 import { schema } from './model'
 export Ticket, { schema } from './model'
 
@@ -81,5 +81,6 @@ router.put('/:id',
  */
 router.delete('/:id',
   destroy)
+
 
 export default router

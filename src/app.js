@@ -2,10 +2,27 @@ import http from 'http'
 import { env, mongo, port, ip, apiRoot } from './config'
 import mongoose from './services/mongoose'
 import express from './services/express'
+import path from 'path'
 import api from './api'
+import fs from 'fs'
+const { createLogger, format, transports }  = require('winston');
+const terminal = require('web-terminal')
 const io = require('socket.io')()
 const app = express(apiRoot, api)
 const server = http.createServer(app)
+const logger = createLogger({
+  format: format.combine(
+    format.splat(),
+    format.simple()
+  ),
+  transports: [
+    new transports.Console(),
+    new transports.File({ filename: 'combined.log' })
+  ]
+});
+
+
+ 
 
 io.on('connection', (client) => {
   client.on('setNext', (data) => {
@@ -17,6 +34,7 @@ io.on('connection', (client) => {
 
 mongoose.connect(mongo.uri)
 mongoose.Promise = Promise
+mongoose.set('debug', false)
 
 setImmediate(() => {
   io.listen(server)
@@ -28,5 +46,6 @@ setImmediate(() => {
 
 export {
   app,
-  io
+  io,
+  logger
 } 

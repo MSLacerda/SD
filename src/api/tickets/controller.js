@@ -1,5 +1,6 @@
 import { success, notFound } from '../../services/response/'
 import { Ticket } from '.'
+import { logger } from '../../app'
 
 export const createNormal = ({ bodymen: { body } }, res, next) => {
   Ticket.count({type: 'normal'})
@@ -9,12 +10,14 @@ export const createNormal = ({ bodymen: { body } }, res, next) => {
         type: 'normal',
         state: 'pending'
       }
+      logger.info(' >>>>>> CRIADO SENHA NORMAL ====>  %s', ticket.ticket)  
       Ticket.create(ticket)
         .then((ticket) => ticket.view(true))
         .then(success(res, 201))
         .catch(next)
     })
 }
+
 
 export const createPriority = ({ bodymen: { body } }, res, next) => {
   Ticket.count({type: 'priority'})
@@ -24,6 +27,7 @@ export const createPriority = ({ bodymen: { body } }, res, next) => {
         type: 'priority',
         state: 'pending'
       }
+      logger.info(' >>>>>> CRIADO SENHA COM PRIORIDADE ====>  %s', ticket.ticket)              
       Ticket.create(ticket)
         .then((ticket) => ticket.view(true))
         .then(success(res, 201))

@@ -6,7 +6,7 @@ import {
 import {
   Ticket
 } from '../tickets'
-import { io } from '../../app';
+import { io, logger } from '../../app';
 const NORMAL = 'normal'
 const PRIORITY = 'priority'
 const config = {
@@ -15,6 +15,11 @@ const config = {
 
 const handle = (res) => (entity) => {
   io.sockets.emit('show_actual_ticket', entity)
+  if (entity != undefined && entity.ticket != undefined) {
+    logger.info(' >>>>>> REQUISITANDO SENHA ====>  %s', entity.ticket)  
+
+
+  }
   if (entity && entity.type === NORMAL) config.counter += 1
   return entity
 }
@@ -48,7 +53,8 @@ const composeFilter = (onlyRead) => {
       } else {
         filter.state = 'pending'
       }
-      console.log('FILTER ==============> ', config.counter, filter.state, filter.type)
+
+
       return resolve(filter)
     })
   })

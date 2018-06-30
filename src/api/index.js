@@ -1,11 +1,24 @@
 import { Router } from 'express'
+import { logger } from '../app'
+import fs from 'fs'
 import tickets from './tickets'
 import ticketsController from './tickets-controller'
-
+const winston = require('winston')
 const router = new Router()
 
 router.use('/tickets', tickets)
 router.use('/tickets-controllers', ticketsController)
+
+router.get('/log', (req, res) => {
+    const file = 'combined.log';
+    res.download(file); // Set disposition and send it.0
+})
+
+router.get('/clearlog', (req, res) => {
+    fs.truncate('combined.log', '', ()=> {
+    	res.status(200).send()
+    })
+})
 
 /**
  * @apiDefine master Master access only
